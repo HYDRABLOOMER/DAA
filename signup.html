@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>connecT - Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    <h2>Create your <span style="color: #1abc9c;">connecT</span> Account</h2>
+    <form class="login-form" onsubmit="handleSignup(event)">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="John Doe" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@university.edu" required />
+
+      <label for="university">University</label>
+      <input type="text" id="university" placeholder="University Name" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Create a password" required />
+
+      <button type="submit">Sign Up</button>
+      <p class="form-note">Already have an account? <a href="login.html">Log in</a></p>
+    </form>
+  </div>
+
+  <script>
+    function handleSignup(event) {
+      event.preventDefault();
+
+      // Simulate successful signup
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>
