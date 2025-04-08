@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>connecT - Login</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    <h2>Welcome to <span style="color: #1abc9c;">connecT</span></h2>
+    <form class="login-form" onsubmit="handleLogin(event)">
+
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@university.edu" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" required />
+
+      <button type="submit">Login</button>
+      <p class="form-note">Don't have an account? <a href="#">Sign up</a></p>
+    </form>
+  </div>
+  <script>
+    function handleLogin(event) {
+      event.preventDefault(); // Prevent actual form submission
+  
+      // You could add some validation here if needed
+  
+      // Simulate successful login
+      window.location.href = "index.html";
+    }
+  </script>
+  
+
+</body>
+</html>
