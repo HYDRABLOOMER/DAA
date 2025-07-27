@@ -1,0 +1,364 @@
+<!DOCTYPE html> <html lang="en"> <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>connecT - Chat</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">connecT</div>
+    <div class="nav-links">
+      <a href="users.html" class="nav-btn" id="usersBtn">Find Users</a>
+      <a href="chat.html" class="nav-btn" id="chatBtn">Messages</a>
+      <a href="project-collaboration.html" class="nav-btn" id="collabBtn">Collaboration</a>
+      <div id="auth-status">
+        <a href="login.html" class="login-btn" id="loginBtn">Login</a>
+        <div id="userInfo" style="display: none;">
+          <span id="userName" style="color: white;"></span>
+          <button id="logoutBtn" class="logout-btn">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Chat Container -->
+  <div class="chat-page-container">
+    <!-- Users List -->
+    <div class="chat-list">
+      <h3>All Users</h3>
+      <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search users...">
+        <i class="fas fa-search search-icon"></i>
+      </div>
+      <div id="usersList" class="users-list">
+        <!-- Users will be populated here -->
+      </div>
+    </div>
+
+    <!-- Chat Window -->
+    <div class="chat-window">
+      <div id="chatHeader" class="chat-header">
+        <h3>Select a user to chat</h3>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <!-- Messages will be populated here -->
+      </div>
+      <div class="chat-input-container">
+        <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+        <button id="sendButton" disabled>
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let socket;
+    let currentChatId = null;
+    let currentUserId = null;
+
+    // Check authentication status
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        
+        const loginBtn = document.getElementById('loginBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (data.isAuthenticated) {
+          loginBtn.parentElement.style.display = 'none';
+          userInfo.style.display = 'flex';
+          userName.textContent = data.user.name;
+          currentUserId = data.user._id;
+          
+          // Initialize socket connection with user ID
+          socket = io({
+            auth: {
+              userId: currentUserId
+            },
+            transports: ['websocket'],
+            upgrade: false,
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000
+          });
+
+          // Socket connection event handlers
+          socket.on('connect', () => {
+            console.log('Socket connected:', socket.id);
+            if (currentChatId) {
+              socket.emit('joinConversation', currentChatId);
+            }
+          });
+
+          socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+          });
+
+          socket.on('error', (error) => {
+            console.error('Socket error:', error);
+            showToast('Connection error', 'error');
+          });
+
+          // Socket message event handler
+          // Register socket.on('chatMessage') only once
+          if (!window._chatMessageHandlerRegistered) {
+            socket.on('chatMessage', (message) => {
+              console.log('Received message:', message);
+              if (message.chatId === currentChatId) {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.sender === currentUserId ? 'sent' : 'received'}`;
+                messageElement.innerHTML = `
+                  <div class="message-content">${message.content}</div>
+                  <div class="message-time">${new Date(message.timestamp).toLocaleTimeString()}</div>
+                `;
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+              }
+            });
+            window._chatMessageHandlerRegistered = true;
+          }
+          
+          // Load friends
+          loadFriends();
+          
+          // Set up message input
+          const messageInput = document.getElementById('messageInput');
+          const sendButton = document.getElementById('sendButton');
+          
+          sendButton.addEventListener('click', sendMessage);
+          messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              sendMessage();
+            }
+          });
+
+          // Set up search functionality
+          const searchInput = document.getElementById('searchInput');
+          let searchTimeout;
+          
+          searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) {
+              clearTimeout(searchTimeout);
+            }
+            
+            // Set new timeout to debounce search
+            searchTimeout = setTimeout(async () => {
+              try {
+                const response = await fetch(`/api/users/search?query=${encodeURIComponent(searchTerm)}`, {
+                  credentials: 'include'
+                });
+                const users = await response.json();
+                
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = '';
+
+                users.forEach(user => {
+                  const userElement = document.createElement('div');
+                  userElement.className = 'user-item';
+                  userElement.innerHTML = `
+                    <div class="user-info">
+                      <h4 class="user-name">${user.name}</h4>
+                      <p class="user-university">${user.university}</p>
+                    </div>
+                    <div class="user-actions">
+                      <button class="friend-btn" onclick="sendFriendRequest('${user._id}')">
+                        <i class="fas fa-user-plus"></i>
+                      </button>
+                      <button class="chat-btn" onclick="startChat('${user._id}', '${user.name}')">
+                        <i class="fas fa-comment"></i>
+                      </button>
+                    </div>
+                  `;
+                  usersList.appendChild(userElement);
+                });
+              } catch (error) {
+                console.error('Error searching users:', error);
+              }
+            }, 300); // 300ms debounce
+          });
+        } else {
+          loginBtn.parentElement.style.display = 'block';
+          userInfo.style.display = 'none';
+          window.location.href = '/login.html';
+        }
+
+        // Add logout functionality
+        logoutBtn.addEventListener('click', async () => {
+          try {
+            const response = await fetch('/api/auth/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
+            if (response.ok) {
+              window.location.reload();
+            }
+          } catch (error) {
+            console.error('Error logging out:', error);
+          }
+        });
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        showToast('Error checking authentication', 'error');
+      }
+    });
+
+    // Load friends (for chat sidebar)
+    async function loadFriends() {
+      try {
+        const response = await fetch('/api/friends', {
+          credentials: 'include'
+        });
+        const friends = await response.json();
+        const usersList = document.getElementById('usersList');
+        usersList.innerHTML = '';
+
+        if (friends.length === 0) {
+          usersList.innerHTML = '<div class="no-friends">No friends found. Add friends to start chatting!</div>';
+          return;
+        }
+
+        friends.forEach(friend => {
+          const userElement = document.createElement('div');
+          userElement.className = 'conversation-item';
+          userElement.innerHTML = `
+            <div class="conversation-info">
+              <h4>${friend.name}</h4>
+              <p>${friend.university || 'No university specified'}</p>
+            </div>
+          `;
+          userElement.addEventListener('click', () => startChat(friend._id, friend.name));
+          usersList.appendChild(userElement);
+        });
+      } catch (error) {
+        console.error('Error loading friends:', error);
+      }
+    }
+
+    // Send friend request
+    async function sendFriendRequest(userId) {
+      try {
+        const response = await fetch('/api/friends/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ userId })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Show success message
+          const friendBtn = event.target.closest('.friend-btn');
+          friendBtn.innerHTML = '<i class="fas fa-check"></i>';
+          friendBtn.style.backgroundColor = '#27ae60';
+          friendBtn.disabled = true;
+          
+          // Show toast notification
+          showToast('Friend request sent successfully!', 'success');
+        } else {
+          // Show error message
+          showToast(data.message || 'Error sending friend request', 'error');
+        }
+      } catch (error) {
+        console.error('Error sending friend request:', error);
+        showToast('Error sending friend request', 'error');
+      }
+    }
+
+    // Start chat
+    async function startChat(userId, userName) {
+      try {
+        const chatHeader = document.getElementById('chatHeader');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        chatHeader.innerHTML = `<h3>${userName}</h3>`;
+        messageInput.disabled = false;
+        sendButton.disabled = false;
+
+        // Create or get conversation
+        const response = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ otherUserId: userId })
+        });
+        const conversation = await response.json();
+        currentChatId = conversation._id;
+        
+        // Leave any previous conversation room
+        if (socket) {
+          socket.emit('leaveConversation', currentChatId);
+        }
+        
+        // Join new conversation room
+        socket.emit('joinConversation', currentChatId);
+        console.log('Joined conversation:', currentChatId);
+        
+        // Load messages
+        loadMessages(conversation._id);
+      } catch (error) {
+        console.error('Error starting chat:', error);
+        showToast('Error starting chat', 'error');
+      }
+    }
+
+    // Load messages
+    async function loadMessages(chatId) {
+      try {
+        const response = await fetch(`/api/messages/${chatId}`, {
+          credentials: 'include'
+        });
+        const messages = await response.json();
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = '';
+
+        messages.forEach(message => {
+          const messageElement = document.createElement('div');
+          messageElement.className = `message ${message.sender === 'me' ? 'sent' : 'received'}`;
+          messageElement.innerHTML = `
+            <div class="message-content">${message.content}</div>
+            <div class="message-time">${new Date(message.timestamp).toLocaleTimeString()}</div>
+          `;
+          chatMessages.appendChild(messageElement);
+        });
+        
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        showToast('Error loading messages', 'error');
+      }
+    }
+
+    // Send message
+    function sendMessage() {
+      const messageInput = document.getElementById('messageInput');
+      const content = messageInput.value.trim();
+      if (content && currentChatId) {
+        socket.emit('chatMessage', {
+          chatId: currentChatId,
+          content: content
+        });
+        messageInput.value = '';
+      }
+    }
+
+  </script>
+</body>
+</html>

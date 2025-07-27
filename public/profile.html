@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile - connecT</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --theme-color: #1abc9c;
+      --theme-hover: #16a085;
+      --box-bg: #ffffff;
+      --border-radius: 12px;
+      --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: var(--theme-color);
+      padding: 1rem 2rem;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links a,
+    .logout-btn {
+      color: white;
+      margin-left: 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .profile-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .profile-header {
+      background: var(--box-bg);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+    }
+
+    .profile-name {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .profile-university {
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      margin: 0;
+      margin-bottom: 1rem;
+    }
+
+    .friends-count {
+      background: var(--theme-color);
+      color: white;
+      padding: 0.5rem 2rem;
+      border-radius: 50px;
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-box {
+      background: var(--box-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: var(--box-shadow);
+    }
+
+    .info-box-title {
+      font-size: 1.2rem;
+      color: var(--theme-color);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-box-content {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    .edit-profile-btn {
+      background: var(--theme-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .edit-profile-btn:hover {
+      background: var(--theme-hover);
+    }
+
+    /* Modal Slide In */
+    .modal.right .modal-dialog {
+      position: fixed;
+      right: 0;
+      margin: auto;
+      height: 100%;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .modal.right.show .modal-dialog {
+      transform: translateX(0);
+    }
+
+    .modal-header {
+      background-color: var(--theme-color);
+      color: white;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">connecT</div>
+    <div class="nav-links">
+      <a href="users.html" class="nav-btn" id="usersBtn">Find Users</a>
+      <a href="chat.html" class="nav-btn" id="chatBtn">Messages</a>
+      <a href="project-collaboration.html" class="nav-btn" id="collabBtn">Collaboration</a>
+      <span id="navbarUserName" style="color:white; font-weight:bold; margin-left:2rem; font-size:1.2rem; cursor:pointer; display:none;"></span>
+      <button id="logoutBtn" class="logout-btn" style="margin-left:2rem; display:none;">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Profile Content -->
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <h1 class="profile-name" id="userName"></h1>
+      <div class="friends-count">
+        <i class="fas fa-users"></i>
+        <span id="friendCount">0</span> Friends
+      </div>
+
+    </div>
+
+    <!-- Profile Information Grid -->
+    <div class="profile-grid">
+      <!-- Skills Box -->
+      <div class="info-box">
+        <h3 class="info-box-title">
+          <i class="fas fa-lightbulb"></i>
+          Skills
+        </h3>
+        <div class="info-box-content" id="skillsPanel">
+          <ul id="skillsList"><li>No skills listed</li></ul>
+        </div>
+      </div>
+      <!-- Interests Box -->
+      <div class="info-box">
+        <h3 class="info-box-title">
+          <i class="fas fa-star"></i>
+          Interests
+        </h3>
+        <div class="info-box-content" id="interestsPanel">
+          <ul id="interestsList"><li>No interests listed</li></ul>
+        </div>
+      </div>
+      <!-- About Me Box -->
+      <div class="info-box">
+        <h3 class="info-box-title">
+          <i class="fas fa-user"></i>
+          About Me
+        </h3>
+        <p class="info-box-content" id="userBio">No bio yet</p>
+      </div>
+
+      <!-- Academic Info Box -->
+      <div class="info-box">
+        <h3 class="info-box-title">
+          <i class="fas fa-graduation-cap"></i>
+          Academic Information
+        </h3>
+        <p class="info-box-content">
+          University: <span id="userUniversity">Not specified</span><br>
+          Student ID: <span id="userStudentId">Not specified</span><br>
+          Major: <span id="userMajor">Not specified</span><br>
+          Department: <span id="userDepartment">Not specified</span><br>
+          Year: <span id="userYear">Not specified</span>
+        </p>
+      </div>
+
+      <!-- Member Since Box -->
+      <div class="info-box">
+        <h3 class="info-box-title">
+          <i class="fas fa-calendar-alt"></i>
+          Member Since
+        </h3>
+        <p class="info-box-content" id="joinDate"></p>
+      </div>
+    </div>
+
+    <!-- Edit Profile Button -->
+    <div style="text-align: center;">
+      <button class="edit-profile-btn" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        <i class="fas fa-edit"></i> Edit Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal fade right" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editProfileForm">
+            <div class="mb-3">
+              <label class="form-label">Student ID</label>
+              <input type="text" class="form-control" id="editStudentId">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">University</label>
+              <input type="text" class="form-control" id="editUniversity">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Major</label>
+              <input type="text" class="form-control" id="editMajor">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Bio</label>
+              <textarea class="form-control" id="editBio" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Department</label>
+              <input type="text" class="form-control" id="editDepartment">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Year</label>
+              <input type="text" class="form-control" id="editYear">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Skills</label>
+              <input type="text" 
+                     class="form-control" 
+                     id="editSkills" 
+                     placeholder="Comma-separated (e.g. ai, ml, python)"
+                     pattern="^[a-zA-Z0-9\s,_-]+$"
+                     maxlength="200"
+                     oninput="validateSkillsInput(this)">
+              <div class="form-text text-muted">
+                Enter 3-10 skills (2-50 chars each). Only letters, numbers, spaces, commas, hyphens, and underscores are allowed.
+              </div>
+              <div id="skillsError" class="invalid-feedback"></div>
+              <div id="skillsCount" class="form-text text-end">0/10 skills</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Interests</label>
+              <input type="text" 
+                     class="form-control" 
+                     id="editInterests" 
+                     placeholder="Comma-separated (e.g. philosophy, sports)"
+                     pattern="^[a-zA-Z0-9\s,_-]+$"
+                     maxlength="200"
+                     oninput="validateInterestsInput(this)">
+              <div class="form-text text-muted">
+                Enter 1-10 interests (2-30 chars each). Only letters, numbers, spaces, commas, hyphens, and underscores are allowed.
+              </div>
+              <div id="interestsError" class="invalid-feedback"></div>
+              <div id="interestsCount" class="form-text text-end">0/10 interests</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="edit-profile-btn" onclick="updateProfile()">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        if (!data.isAuthenticated) {
+          window.location.href = '/login.html';
+          return false;
+        }
+        return true;
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        return false;
+      }
+    }
+
+    async function loadProfile() {
+      try {
+        console.log('Loading profile...');
+        const response = await fetch('/api/profile', { credentials: 'include' });
+        if (!response.ok) {
+          console.error('Failed to load profile:', response.status, response.statusText);
+          throw new Error('Failed to load profile');
+        }
+        const data = await response.json();
+        console.log('Profile data received:', data);
+        if (data.success) {
+          const user = data.user;
+          console.log('User data:', user);
+          
+          // Update profile information
+          document.getElementById('userName').textContent = user.name || 'Your Name';
+          document.getElementById('userUniversity').textContent = user.university || 'Not specified';
+          document.getElementById('userStudentId').textContent = user.studentId || 'Not specified';
+          document.getElementById('userMajor').textContent = user.major || 'Not specified';
+          // Skills panel
+          const skillsList = document.getElementById('skillsList');
+          if (user.skills && user.skills.length) {
+            skillsList.innerHTML = '';
+            user.skills.forEach(skill => {
+              const li = document.createElement('li');
+              li.textContent = skill;
+              skillsList.appendChild(li);
+            });
+          } else {
+            skillsList.innerHTML = '<li>No skills listed</li>';
+          }
+          // Interests panel
+          const interestsList = document.getElementById('interestsList');
+          if (user.interests && user.interests.length) {
+            interestsList.innerHTML = '';
+            user.interests.forEach(interest => {
+              const li = document.createElement('li');
+              li.textContent = interest;
+              interestsList.appendChild(li);
+            });
+          } else {
+            interestsList.innerHTML = '<li>No interests listed</li>';
+          }
+          
+          // Update friends count with proper check
+          const friendsCount = Array.isArray(user.friends) ? user.friends.length : 0;
+          document.getElementById('friendCount').textContent = friendsCount;
+          console.log('Friends count:', friendsCount);
+          
+          // Update other profile fields
+          document.getElementById('userBio').textContent = user.bio || 'No bio yet';
+          document.getElementById('userDepartment').textContent = user.department || 'Not specified';
+          document.getElementById('userYear').textContent = user.year || 'Not specified';
+          document.getElementById('joinDate').textContent = new Date(user.createdAt).toLocaleDateString();
+
+          // Update form fields
+          document.getElementById('editStudentId').value = user.studentId || '';
+          document.getElementById('editUniversity').value = user.university || '';
+          document.getElementById('editMajor').value = user.major || '';
+          document.getElementById('editBio').value = user.bio || '';
+          document.getElementById('editDepartment').value = user.department || '';
+          document.getElementById('editYear').value = user.year || '';
+        
+          // Load skills and interests
+          const skillsInput = document.getElementById('editSkills');
+          const interestsInput = document.getElementById('editInterests');
+          
+          if (Array.isArray(data.skills)) {
+            skillsInput.value = data.skills.join(', ');
+            validateSkillsInput(skillsInput);
+          }
+          
+          if (Array.isArray(data.interests)) {
+            interestsInput.value = data.interests.join(', ');
+            validateInterestsInput(interestsInput);
+          }
+        } else {
+          console.error('Profile load failed:', data.message);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Error loading profile data');
+      }
+    }
+
+    function validateInputItems(input, fieldName, minItems = 1, maxItems = 10, minLength = 2, maxLength = 30) {
+      const value = input.value.trim();
+      const items = value.split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
+      
+      const errorElement = document.getElementById(`${fieldName}Error`);
+      const countElement = document.getElementById(`${fieldName}Count`);
+      let isValid = true;
+      
+      // Check number of items
+      if (items.length > maxItems) {
+        errorElement.textContent = `Maximum ${maxItems} ${fieldName} allowed`;
+        input.classList.add('is-invalid');
+        isValid = false;
+      } else if (items.length < minItems) {
+        errorElement.textContent = `Please enter at least ${minItems} ${fieldName === 'skills' ? 'skill' : 'interest'}`;
+        input.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        // Check each item's length and characters
+        for (const item of items) {
+          if (item.length < minLength || item.length > maxLength) {
+            errorElement.textContent = `Each ${fieldName === 'skills' ? 'skill' : 'interest'} must be between ${minLength} and ${maxLength} characters`;
+            input.classList.add('is-invalid');
+            isValid = false;
+            break;
+          }
+          if (!/^[a-zA-Z0-9\s_-]+$/.test(item)) {
+            errorElement.textContent = 'Only letters, numbers, spaces, hyphens, and underscores are allowed';
+            input.classList.add('is-invalid');
+            isValid = false;
+            break;
+          }
+        }
+      }
+      
+      if (isValid) {
+        errorElement.textContent = '';
+        input.classList.remove('is-invalid');
+      }
+      
+      // Update counter
+      countElement.textContent = `${items.length}/${maxItems} ${fieldName}`;
+      countElement.className = `form-text text-end ${items.length > maxItems ? 'text-danger' : 'text-muted'}`;
+      
+      return isValid;
+    }
+    
+    function validateSkillsInput(input) {
+      return validateInputItems(input, 'skills', 0, 10, 2, 50);
+    }
+    
+    function validateInterestsInput(input) {
+      return validateInputItems(input, 'interests', 0, 10, 2, 30);
+    }
+    
+    function validateProfileForm() {
+      const skillsInput = document.getElementById('editSkills');
+      const interestsInput = document.getElementById('editInterests');
+      
+      const isSkillsValid = validateInputItems(skillsInput, 'skills', 0, 10, 2, 50);
+      const isInterestsValid = validateInputItems(interestsInput, 'interests', 0, 10, 2, 30);
+      
+      return isSkillsValid && isInterestsValid;
+    }
+    
+    async function updateProfile() {
+      try {
+        console.log('Updating profile...');
+        
+        if (!validateProfileForm()) {
+          return; // Don't proceed if validation fails
+        }
+        
+        const formData = {
+          studentId: document.getElementById('editStudentId').value,
+          university: document.getElementById('editUniversity').value,
+          major: document.getElementById('editMajor').value,
+          bio: document.getElementById('editBio').value,
+          department: document.getElementById('editDepartment').value,
+          year: document.getElementById('editYear').value,
+          skills: document.getElementById('editSkills').value
+            .split(',')
+            .map(s => s.trim().toLowerCase())
+            .filter(Boolean),
+          interests: document.getElementById('editInterests').value
+            .split(',')
+            .map(s => s.trim().toLowerCase())
+            .filter(Boolean)
+        };
+        console.log('Form data:', formData);
+
+        const response = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        console.log('Update response:', data);
+        if (data.success) {
+          console.log('Profile updated successfully');
+          alert('Profile updated successfully');
+          loadProfile();
+          bootstrap.Modal.getInstance(document.getElementById('editProfileModal')).hide();
+        } else {
+          console.error('Profile update failed:', data.message);
+          alert(data.message || 'Error updating profile');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        const navbarUserName = document.getElementById('navbarUserName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (data.isAuthenticated) {
+          navbarUserName.textContent = data.user.name;
+          navbarUserName.style.display = 'inline';
+          logoutBtn.style.display = 'inline-block';
+          navbarUserName.onclick = () => { window.location.href = '/profile.html'; };
+        } else {
+          navbarUserName.style.display = 'none';
+          logoutBtn.style.display = 'none';
+        }
+        logoutBtn.addEventListener('click', async () => {
+          try {
+            const response = await fetch('/api/auth/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
+            if (response.ok) {
+              window.location.reload();
+            }
+          } catch (error) {
+            console.error('Error logging out:', error);
+          }
+        });
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+      if (await checkAuth()) {
+        loadProfile();
+      }
+    });
+  </script>
+</body>
+</html>

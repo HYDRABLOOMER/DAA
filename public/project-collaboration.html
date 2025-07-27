@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Collaboration - connecT</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: #1a1a1a;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: #1a1a1a;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .section-content {
+      display: block;
+    }
+    .section-content.hidden {
+      display: none;
+    }
+    .toggle-btn {
+      float: right;
+      background: none;
+      border: none;
+      color: #1abc9c;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .toggle-btn:hover {
+      color: #16a085;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+    input[type="number"] {
+      width: 100px;
+    }
+    textarea#description {
+      height: 150px;
+      resize: vertical;
+    }
+    .char-counter {
+      font-size: 0.85rem;
+      color: #666;
+      text-align: right;
+      margin-top: 5px;
+    }
+    select {
+      appearance: none;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path fill="%23666" d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+      background-size: 12px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      color: white;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+      margin-right: 5px;
+    }
+    .btn-primary { background-color: #1abc9c; }
+    .btn-primary:hover { background-color: #16a085; }
+    .btn-success { background-color: #28a745; }
+    .btn-success:hover { background-color: #1e7e34; }
+    .btn-danger { background-color: #dc3545; }
+    .btn-danger:hover { background-color: #b02a37; }
+    .btn-secondary { background-color: #6c757d; }
+    .btn-secondary:hover { background-color: #5a6268; }
+    .btn-disabled { background-color: #ccc; cursor: not-allowed; }
+    .btn-warning { background-color: #ffc107; color: #333; }
+    .btn-warning:hover { background-color: #e0a800; }
+    .error { color: #dc3545; font-size: 0.9rem; }
+    .message { color: #28a745; font-size: 0.9rem; text-align: center; }
+    .loading {
+      display: none;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li.project-card, li.user-card, li.proposal-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      background: #fff;
+    }
+    li.project-card strong, li.user-card strong, li.proposal-card strong {
+      font-size: 1.1rem;
+    }
+    .project-details {
+      margin-top: 10px;
+    }
+    .project-details.hidden {
+      display: none;
+    }
+    .project-toggle-btn {
+      background: none;
+      border: none;
+      color: #1abc9c;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
+    .project-toggle-btn:hover {
+      color: #16a085;
+    }
+    .feedback-form {
+      margin-top: 10px;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .feedback-form select {
+      width: 80px;
+      margin-right: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+    }
+    .modal-content textarea {
+      height: 100px;
+    }
+    .close-btn {
+      float: right;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+    .user-match-score {
+      background: #e8f5e8;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin: 5px 0;
+    }
+    .skills-list, .interests-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin: 5px 0;
+    }
+    .skill-tag, .interest-tag {
+      background: #f0f0f0;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+    @media (max-width: 600px) {
+      .main-container { padding: 10px; }
+      button { width: 100%; margin-bottom: 10px; }
+      h1 { font-size: 1.8rem; }
+      h2 { font-size: 1.3rem; }
+      input[type="number"] { width: 100%; }
+      .feedback-form select { width: 100%; margin-bottom: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" style="background-color: #1abc9c; padding: 1rem 2rem; color: white; display: flex; justify-content: space-between; align-items: center;">
+    <div class="nav-logo" style="font-size: 1.5rem; font-weight: bold;">connecT</div>
+    <div class="nav-links" style="display: flex; align-items: center;">
+      <a href="users.html" class="nav-btn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Find Users</a>
+      <a href="chat.html" class="nav-btn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Messages</a>
+      <a href="project-collaboration.html" class="nav-btn active" style="color: white; margin-left: 1rem; text-decoration: underline; font-weight: 500;">Project Collaboration</a>
+      <a href="events.html" class="nav-btn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Events</a>
+      <span id="navbarUserName" style="color:white; font-weight:bold; margin-left:2rem; font-size:1.2rem; cursor:pointer; display:none;"></span>
+      <button id="logoutBtn" class="logout-btn" style="margin-left:2rem; display:none; background: none; border: none; color: white; font-weight: 500; cursor: pointer;">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <h1>Project Collaboration System</h1>
+    <div id="message" class="message"></div>
+
+    <div class="section" id="project-form">
+      <h2>Create a Project <button class="toggle-btn" onclick="toggleSection('project-form-content')">Hide</button></h2>
+      <div id="project-form-content" class="section-content">
+        <div id="error" class="error"></div>
+        <div class="form-group">
+          <label for="title">Project Title</label>
+          <input type="text" id="title" placeholder="Enter project title" maxlength="100">
+        </div>
+        <div class="form-group">
+          <label for="description">Project Description</label>
+          <textarea id="description" placeholder="Enter project description" maxlength="2000"></textarea>
+          <div id="char-counter" class="char-counter">0/2000 characters</div>
+        </div>
+        <div class="form-group">
+          <label for="skills">Required Skills (comma-separated)</label>
+          <input type="text" id="skills" placeholder="e.g., JavaScript, React, Node.js">
+        </div>
+        <div class="form-group">
+          <label for="interests">Preferred Interests (comma-separated)</label>
+          <input type="text" id="interests" placeholder="e.g., Web Development, AI, Data Science">
+        </div>
+        <div class="form-group">
+          <label for="category">Project Category</label>
+          <select id="category">
+            <option value="">Select category</option>
+            <option value="web-development">Web Development</option>
+            <option value="mobile-app">Mobile App</option>
+            <option value="data-science">Data Science</option>
+            <option value="ai-ml">AI/ML</option>
+            <option value="research">Research</option>
+            <option value="design">Design</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="team-size">Maximum Team Size</label>
+          <input type="number" id="team-size" min="2" max="10" placeholder="4" value="4">
+        </div>
+        <div class="form-group">
+          <label for="deadline">Project Deadline (optional)</label>
+          <input type="date" id="deadline">
+        </div>
+        <button class="btn-primary" onclick="submitProject()">
+          <i class="fas fa-plus"></i> Create Project & Get Recommendations
+        </button>
+        <div id="loading" class="loading">
+          <i class="fas fa-spinner fa-spin"></i> Loading recommendations...
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="recommendations">
+      <h2>Recommended Users <button class="toggle-btn" onclick="toggleSection('recommendations-content')">Hide</button></h2>
+      <div id="recommendations-content" class="section-content">
+        <div id="recommendations-info" style="margin-bottom: 15px; color: #666; font-size: 0.9rem;"></div>
+        <ul id="recommendations-list">
+          <li>Create a project above to see user recommendations</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section" id="invitations">
+      <h2>My Invitations <button class="toggle-btn" onclick="toggleSection('invitations-content')">Hide</button></h2>
+      <div id="invitations-content" class="section-content">
+        <ul id="invitations-list">
+          <li>No pending invitations</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section" id="my-projects">
+      <h2>My Projects <button class="toggle-btn" onclick="toggleSection('my-projects-content')">Hide</button></h2>
+      <div id="my-projects-content" class="section-content">
+        <div class="form-group">
+          <label for="project-filter">Filter Projects</label>
+          <select id="project-filter" onchange="renderMyProjects()">
+            <option value="all">All Projects</option>
+            <option value="created">Created by Me</option>
+            <option value="joined">Joined Projects</option>
+            <option value="recruiting">Recruiting</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <ul id="my-projects-list">
+          <li>No projects yet</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invitation Modal -->
+  <div id="invitation-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeInvitationModal()">&times;</span>
+      <h3>Send Project Invitation</h3>
+      <div class="form-group">
+        <label>Inviting: <span id="invitation-recipient"></span></label>
+        <label for="invitation-message">Personal Message (optional)</label>
+        <textarea id="invitation-message" placeholder="Tell them why you'd like to work together..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="sendInvitation()">
+        <i class="fas fa-paper-plane"></i> Send Invitation
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let currentUser = null;
+    let currentProject = null;
+    let recommendations = [];
+    let myProjects = { created: [], joined: [], applications: [] };
+    let invitations = [];
+    let currentInvitationUserId = null;
+
+    // DOM Elements
+    const messageEl = document.getElementById("message");
+    const errorEl = document.getElementById("error");
+    const titleEl = document.getElementById("title");
+    const descriptionEl = document.getElementById("description");
+    const skillsEl = document.getElementById("skills");
+    const interestsEl = document.getElementById("interests");
+    const categoryEl = document.getElementById("category");
+    const teamSizeEl = document.getElementById("team-size");
+    const deadlineEl = document.getElementById("deadline");
+    const charCounterEl = document.getElementById("char-counter");
+    const recommendationsList = document.getElementById("recommendations-list");
+    const recommendationsInfo = document.getElementById("recommendations-info");
+    const invitationsList = document.getElementById("invitations-list");
+    const myProjectsList = document.getElementById("my-projects-list");
+    const projectFilterEl = document.getElementById("project-filter");
+    const loadingEl = document.getElementById("loading");
+    const invitationModal = document.getElementById("invitation-modal");
+    const invitationMessage = document.getElementById("invitation-message");
+    const invitationRecipient = document.getElementById("invitation-recipient");
+
+    // Character Counter for Description
+    descriptionEl.addEventListener("input", () => {
+      const maxLength = 2000;
+      const length = descriptionEl.value.length;
+      charCounterEl.textContent = `${length}/${maxLength} characters`;
+      if (length > maxLength) {
+        descriptionEl.value = descriptionEl.value.slice(0, maxLength);
+        charCounterEl.textContent = `${maxLength}/${maxLength} characters`;
+      }
+    });
+
+    // Utility Functions
+    function showMessage(text, isError = false) {
+      messageEl.textContent = text;
+      messageEl.className = isError ? "error" : "message";
+      setTimeout(() => {
+        messageEl.textContent = "";
+        messageEl.className = "message";
+      }, 5000);
+    }
+
+    function showError(text) {
+      errorEl.textContent = text;
+      setTimeout(() => errorEl.textContent = "", 5000);
+    }
+
+    // Toggle Section
+    function toggleSection(contentId) {
+      const content = document.getElementById(contentId);
+      const btn = content.previousElementSibling.querySelector(".toggle-btn");
+      content.classList.toggle("hidden");
+      btn.textContent = content.classList.contains("hidden") ? "Show" : "Hide";
+    }
+
+    // Authentication
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/status', { credentials: 'include' });
+        const data = await response.json();
+        
+        if (!data.isAuthenticated) {
+          window.location.href = '/login.html';
+          return false;
+        }
+        
+        currentUser = data.user;
+        return true;
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        window.location.href = '/login.html';
+        return false;
+      }
+    }
+
+    // Project Creation
+    async function submitProject() {
+      const title = titleEl.value.trim();
+      const description = descriptionEl.value.trim();
+      const skills = skillsEl.value.trim();
+      const interests = interestsEl.value.trim();
+      const category = categoryEl.value;
+      const teamSize = parseInt(teamSizeEl.value) || 4;
+      const deadline = deadlineEl.value;
+
+      // Validation
+      if (!title || !description || !skills) {
+        showError("Title, description, and required skills are required");
+        return;
+      }
+
+      if (title.length > 100) {
+        showError("Title cannot exceed 100 characters");
+        return;
+      }
+
+      if (description.length > 2000) {
+        showError("Description cannot exceed 2000 characters");
+        return;
+      }
+
+      errorEl.textContent = "";
+      loadingEl.style.display = "block";
+
+      try {
+        const projectData = {
+          title,
+          description,
+          requiredSkills: skills.split(",").map(s => s.trim()).filter(s => s),
+          preferredInterests: interests.split(",").map(s => s.trim()).filter(s => s),
+          category: category || "other",
+          maxMembers: teamSize,
+          deadline: deadline || null
+        };
+
+        // Create project
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(projectData)
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.message || 'Failed to create project');
+        }
+
+        currentProject = result.project;
+        showMessage("Project created successfully! Loading recommendations...");
+
+        // Get recommendations for the project
+        await getRecommendations(currentProject._id);
+
+        // Clear form
+        titleEl.value = "";
+        descriptionEl.value = "";
+        skillsEl.value = "";
+        interestsEl.value = "";
+        categoryEl.value = "";
+        teamSizeEl.value = "4";
+        deadlineEl.value = "";
+        charCounterEl.textContent = "0/2000 characters";
+
+        // Refresh my projects
+        await loadMyProjects();
+
+      } catch (error) {
+        console.error('Error creating project:', error);
+        showError("Error creating project: " + error.message);
+      } finally {
+        loadingEl.style.display = "none";
+      }
+    }
+
+    // Get Recommendations - FIXED TO SET CURRENT PROJECT
+    async function getRecommendations(projectId) {
+      try {
+        console.log("=== GET RECOMMENDATIONS DEBUG ===");
+        console.log("Project ID:", projectId);
+
+        // FIRST: Get the project details to set currentProject
+        const projectResponse = await fetch(`/api/projects/${projectId}`, {
+          credentials: 'include'
+        });
+
+        const projectData = await projectResponse.json();
+        
+        if (projectData.success) {
+          currentProject = projectData.project;
+          console.log("✅ Current project set:", currentProject);
+        } else {
+          console.error("❌ Failed to get project details");
+        }
+
+        // THEN: Get recommendations
+        const response = await fetch(`/api/projects/${projectId}/user-recommendations`, {
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to get recommendations');
+        }
+
+        recommendations = data.recommendations || [];
+        renderRecommendations();
+
+      } catch (error) {
+        console.error('Error getting recommendations:', error);
+        showError("Error loading recommendations: " + error.message);
+      }
+    }
+
+    // Render Recommendations
+    function renderRecommendations() {
+      if (recommendations.length === 0) {
+        recommendationsList.innerHTML = "<li>No recommendations available for this project</li>";
+        recommendationsInfo.textContent = "";
+        return;
+      }
+
+      recommendationsInfo.textContent = `Found ${recommendations.length} recommended users for your project`;
+
+      recommendationsList.innerHTML = recommendations.map(rec => {
+        const user = rec.user || rec;
+        const matchScore = Math.round((rec.matchScore?.overall || rec.score?.overall || 0) * 100);
+        const skillsMatch = Math.round((rec.matchScore?.skills || rec.score?.skills || 0) * 100);
+        const interestsMatch = Math.round((rec.matchScore?.interests || rec.score?.interests || 0) * 100);
+
+        return `
+          <li class="user-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="flex: 1;">
+                <strong>${user.name}</strong>
+                <div class="user-match-score">
+                  <i class="fas fa-star"></i> ${matchScore}% Match
+                </div>
+                <p><strong>Department:</strong> ${user.department || 'Not specified'}</p>
+                <p><strong>University:</strong> ${user.university || 'Not specified'}</p>
+                
+                ${user.skills && user.skills.length > 0 ? `
+                  <p><strong>Skills:</strong></p>
+                  <div class="skills-list">
+                    ${user.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                  </div>
+                  <small>Skills Match: ${skillsMatch}%</small>
+                ` : ''}
+                
+                ${user.interests && user.interests.length > 0 ? `
+                  <p><strong>Interests:</strong></p>
+                  <div class="interests-list">
+                    ${user.interests.map(interest => `<span class="interest-tag">${interest}</span>`).join('')}
+                  </div>
+                  <small>Interests Match: ${interestsMatch}%</small>
+                ` : ''}
+                
+                ${user.bio ? `<p><strong>Bio:</strong> ${user.bio}</p>` : ''}
+              </div>
+              <div style="margin-left: 15px;">
+                <button class="btn-primary" onclick="openInvitationModal('${user._id}', '${user.name}')">
+                  <i class="fas fa-paper-plane"></i> Invite
+                </button>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    // Invitation Modal
+    function openInvitationModal(userId, userName) {
+      console.log("=== OPENING INVITATION MODAL ===");
+      console.log("User ID:", userId);
+      console.log("User Name:", userName);
+      console.log("Current Project:", currentProject);
+      
+      currentInvitationUserId = userId;
+      invitationRecipient.textContent = userName;
+      invitationMessage.value = "";
+      invitationModal.style.display = "flex";
+    }
+
+    function closeInvitationModal() {
+      invitationModal.style.display = "none";
+      currentInvitationUserId = null;
+    }
+
+    // Send Invitation - ENHANCED WITH DEBUG
+    async function sendInvitation() {
+      console.log("=== SEND INVITATION FRONTEND DEBUG ===");
+      console.log("Current Invitation User ID:", currentInvitationUserId);
+      console.log("Current Project:", currentProject);
+      console.log("Message:", invitationMessage.value);
+
+      if (!currentInvitationUserId || !currentProject) {
+        console.error("Missing data:", { currentInvitationUserId, currentProject });
+        showError("Missing invitation data");
+        return;
+      }
+
+      try {
+        const requestData = {
+          projectId: currentProject._id,
+          userId: currentInvitationUserId,
+          message: invitationMessage.value.trim()
+        };
+
+        console.log("Sending request with data:", requestData);
+
+        const response = await fetch('/api/projects/send-invitation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(requestData)
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response ok:", response.ok);
+
+        const data = await response.json();
+        console.log("Response data:", data);
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to send invitation');
+        }
+
+        showMessage("Invitation sent successfully!");
+        closeInvitationModal();
+
+      } catch (error) {
+        console.error('Error sending invitation:', error);
+        showError("Error sending invitation: " + error.message);
+      }
+    }
+
+    // Load My Projects
+    async function loadMyProjects() {
+      try {
+        const response = await fetch('/api/projects/my', { credentials: 'include' });
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to load projects');
+        }
+
+        myProjects = {
+          created: data.createdProjects || [],
+          joined: data.joinedProjects || [],
+          applications: data.applications || []
+        };
+
+        renderMyProjects();
+
+      } catch (error) {
+        console.error('Error loading my projects:', error);
+        showError("Error loading projects: " + error.message);
+      }
+    }
+
+    // Render My Projects - UPDATED TO SET CURRENT PROJECT WHEN FINDING MEMBERS
+    function renderMyProjects() {
+      const filter = projectFilterEl.value;
+      let projects = [];
+
+      switch (filter) {
+        case 'created':
+          projects = myProjects.created;
+          break;
+        case 'joined':
+          projects = myProjects.joined;
+          break;
+        case 'recruiting':
+          projects = [...myProjects.created, ...myProjects.joined].filter(p => p.status === 'recruiting');
+          break;
+        case 'in-progress':
+          projects = [...myProjects.created, ...myProjects.joined].filter(p => p.status === 'in-progress');
+          break;
+        case 'completed':
+          projects = [...myProjects.created, ...myProjects.joined].filter(p => p.status === 'completed');
+          break;
+        default:
+          projects = [...myProjects.created, ...myProjects.joined];
+      }
+
+      if (projects.length === 0) {
+        myProjectsList.innerHTML = "<li>No projects match the selected filter</li>";
+        return;
+      }
+
+      myProjectsList.innerHTML = projects.map(project => {
+        const isCreator = project.creator._id === currentUser._id;
+        const memberCount = project.currentMembers ? project.currentMembers.length : 0;
+        const availableSpots = project.maxMembers - memberCount;
+
+        return `
+          <li class="project-card">
+            <div style="display: flex; justify-content: between; align-items: flex-start;">
+              <div style="flex: 1;">
+                <strong>${project.title}</strong>
+                <span style="margin-left: 10px; padding: 2px 8px; background: ${getStatusColor(project.status)}; color: white; border-radius: 12px; font-size: 0.8rem;">
+                  ${project.status.toUpperCase()}
+                </span>
+                ${isCreator ? '<span style="margin-left: 5px; color: #1abc9c; font-weight: bold;">(Creator)</span>' : ''}
+                
+                <p>${project.description}</p>
+                
+                <p><strong>Category:</strong> ${project.category}</p>
+                <p><strong>Team:</strong> ${memberCount}/${project.maxMembers} members</p>
+                
+                ${project.requiredSkills && project.requiredSkills.length > 0 ? `
+                  <p><strong>Required Skills:</strong></p>
+                  <div class="skills-list">
+                    ${project.requiredSkills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                  </div>
+                ` : ''}
+                
+                ${project.deadline ? `<p><strong>Deadline:</strong> ${new Date(project.deadline).toLocaleDateString()}</p>` : ''}
+                
+                <p><strong>Created:</strong> ${new Date(project.createdAt).toLocaleDateString()}</p>
+              </div>
+              
+              <div style="margin-left: 15px;">
+                ${isCreator && project.status === 'recruiting' ? `
+                  <button class="btn-primary" onclick="findMembersForProject('${project._id}')">
+                    <i class="fas fa-users"></i> Find Members
+                  </button>
+                ` : ''}
+                
+                ${isCreator ? `
+                  <button class="btn-secondary" onclick="updateProjectStatus('${project._id}', '${project.status}')">
+                    <i class="fas fa-edit"></i> Update Status
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </li>
+        `;
+      }).join("");
+    }
+
+    // NEW FUNCTION: Find members for existing project
+    async function findMembersForProject(projectId) {
+      console.log("=== FIND MEMBERS FOR PROJECT ===");
+      console.log("Project ID:", projectId);
+      
+      // Set current project from myProjects data
+      const allProjects = [...myProjects.created, ...myProjects.joined];
+      currentProject = allProjects.find(p => p._id === projectId);
+      
+      console.log("✅ Set current project:", currentProject);
+      
+      // Get recommendations
+      await getRecommendations(projectId);
+    }
+
+    function getStatusColor(status) {
+      switch (status) {
+        case 'recruiting': return '#1abc9c';
+        case 'in-progress': return '#f39c12';
+        case 'completed': return '#27ae60';
+        case 'cancelled': return '#e74c3c';
+        default: return '#95a5a6';
+      }
+    }
+
+    // Add missing updateProjectStatus function
+    async function updateProjectStatus(projectId, currentStatus) {
+      const statusOptions = ['recruiting', 'in-progress', 'completed', 'cancelled'];
+      const newStatus = prompt(`Current status: ${currentStatus}\nEnter new status (${statusOptions.join(', ')}):`);
+      
+      if (!newStatus || !statusOptions.includes(newStatus)) {
+        showError("Invalid status. Please choose from: " + statusOptions.join(', '));
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/projects/status', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ projectId, status: newStatus })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to update project status');
+        }
+
+        showMessage("Project status updated successfully!");
+        await loadMyProjects();
+
+      } catch (error) {
+        console.error('Error updating project status:', error);
+        showError("Error updating project status: " + error.message);
+      }
+    }
+
+    // Load Invitations
+    async function loadInvitations() {
+      try {
+        const response = await fetch('/api/projects/invitations', { credentials: 'include' });
+        
+        // Handle 500 errors gracefully
+        if (!response.ok) {
+          console.warn('Invitations API not available yet');
+          invitationsList.innerHTML = "<li>Invitations feature coming soon...</li>";
+          return;
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to load invitations');
+        }
+
+        invitations = data.invitations || [];
+        renderInvitations();
+
+      } catch (error) {
+        console.warn('Error loading invitations (API not implemented yet):', error);
+        invitationsList.innerHTML = "<li>Invitations feature coming soon...</li>";
+      }
+    }
+
+    // Render Invitations
+    function renderInvitations() {
+      if (invitations.length === 0) {
+        invitationsList.innerHTML = "<li>No pending invitations</li>";
+        return;
+      }
+
+      invitationsList.innerHTML = invitations.map(invitation => `
+        <li class="proposal-card">
+          <strong>${invitation.project.title}</strong>
+          <p><strong>From:</strong> ${invitation.sender.name}</p>
+          <p><strong>Project Description:</strong> ${invitation.project.description}</p>
+          ${invitation.message ? `<p><strong>Personal Message:</strong> ${invitation.message}</p>` : ''}
+          <p><strong>Received:</strong> ${new Date(invitation.createdAt).toLocaleDateString()}</p>
+          
+          <div style="margin-top: 10px;">
+            <button class="btn-success" onclick="respondToInvitation('${invitation._id}', 'accept')">
+              <i class="fas fa-check"></i> Accept
+            </button>
+            <button class="btn-danger" onclick="respondToInvitation('${invitation._id}', 'reject')">
+              <i class="fas fa-times"></i> Decline
+            </button>
+          </div>
+        </li>
+      `).join("");
+    }
+
+    // Respond to Invitation
+    async function respondToInvitation(invitationId, action) {
+      try {
+        const response = await fetch('/api/projects/handle-invitation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ invitationId, action })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to respond to invitation');
+        }
+
+        showMessage(`Invitation ${action}ed successfully!`);
+        await loadInvitations();
+        await loadMyProjects();
+
+      } catch (error) {
+        console.error('Error responding to invitation:', error);
+        showError("Error responding to invitation: " + error.message);
+      }
+    }
+
+    // Navbar user and logout logic
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        const navbarUserName = document.getElementById('navbarUserName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        if (data.isAuthenticated) {
+          navbarUserName.textContent = data.user.name;
+          navbarUserName.style.display = 'inline';
+          logoutBtn.style.display = 'inline-block';
+          navbarUserName.onclick = () => { window.location.href = '/profile.html'; };
+        } else {
+          navbarUserName.style.display = 'none';
+          logoutBtn.style.display = 'none';
+        }
+        
+        logoutBtn.addEventListener('click', async () => {
+          try {
+            const response = await fetch('/api/auth/logout', {
+              method: 'POST',
+              credentials: 'include'
+            });
+            if (response.ok) {
+              window.location.href = '/login.html';
+            }
+          } catch (error) {
+            console.error('Error logging out:', error);
+          }
+        });
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+      }
+
+      // Initialize the page
+      if (await checkAuth()) {
+        await loadMyProjects();
+        await loadInvitations();
+      }
+    });
+
+    // Close modal when clicking outside
+    invitationModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeInvitationModal();
+      }
+    });
+  </script>
+</body>
+</html>

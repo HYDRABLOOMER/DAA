@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>connecT - Home</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">connecT</div>
+    <div class="nav-links">
+      <a href="users.html" class="nav-btn" id="usersBtn">Find Users</a>
+      <a href="chat.html" class="nav-btn" id="chatBtn">Messages</a>
+      <span id="navbarUserName" style="color:white; font-weight:bold; margin-left:2rem; font-size:1.2rem; cursor:pointer; display:none;"></span>
+      <button id="logoutBtn" class="logout-btn" style="margin-left:2rem; display:none;">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="home-hero">
+    <h1>Welcome to <span class="highlight">connecT</span></h1>
+    <p>Empowering university students to collaborate, connect, and grow together!</p>
+  </header>
+
+  <!-- Dashboard Cards -->
+  <section class="home-cards">
+    <div class="card">
+      <i class="fas fa-user-circle fa-3x"></i>
+      <h3>Your Profile</h3>
+      <p>View and update your information.</p>
+      <a href="profile" class="card-btn">Go to Profile</a>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-users fa-3x"></i>
+      <h3>Collaboration</h3>
+      <p>Join or post projects and academic help requests.</p>
+      <a href="project-collaboration.html" class="card-btn">Explore Projects</a>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-comments fa-3x"></i>
+      <h3>Chat</h3>
+      <p>Start conversations and stay in touch with peers.</p>
+      <a href="chat.html" class="card-btn">Open Chat</a>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-calendar-alt fa-3x"></i>
+      <h3>Events</h3>
+      <p>Discover upcoming university events.</p>
+      <a href="events.html" class="card-btn">See Events</a>
+    </div>
+
+    <div class="card">
+      <i class="fas fa-user-friends fa-3x"></i>
+      <h3>Recommendations</h3>
+      <p>Find new friends based on your network.</p>
+      <a href="recommendations.html" class="card-btn">View Recommendations</a>
+    </div>
+  </section>
+
+</body>
+<script>
+  // Check authentication status when page loads
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('/api/auth/status');
+      const data = await response.json();
+      
+      const navbarUserName = document.getElementById('navbarUserName');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const usersBtn = document.getElementById('usersBtn');
+      const chatBtn = document.getElementById('chatBtn');
+      
+      if (data.isAuthenticated) {
+        navbarUserName.textContent = data.user.name;
+        navbarUserName.style.display = 'inline';
+        logoutBtn.style.display = 'inline-block';
+        // Make name clickable to go to profile
+        navbarUserName.onclick = () => { window.location.href = '/profile.html'; };
+      } else {
+        navbarUserName.style.display = 'none';
+        logoutBtn.style.display = 'none';
+      }
+
+      // Add logout functionality
+      logoutBtn.addEventListener('click', async () => {
+        try {
+          const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include'
+          });
+          if (response.ok) {
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Error logging out:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+    }
+  });
+</script>
+</html>

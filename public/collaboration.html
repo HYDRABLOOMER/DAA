@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaboration - connecT</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .collab-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .team-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .member-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        .member-info {
+            flex: 1;
+        }
+        .member-info h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .member-info p {
+            margin: 0.25rem 0 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .recommendations-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .recommendation-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .recommendation-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .recommendation-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #6c757d;
+        }
+        .recommendation-details h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+        .recommendation-details p {
+            margin: 0.25rem 0 0;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .add-member-btn {
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .team-info {
+            margin-bottom: 1rem;
+        }
+        .team-info h3 {
+            margin: 0 0 0.5rem 0;
+        }
+        .team-info p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-dialog {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .modal-body {
+            padding: 1rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" style="background-color: #1abc9c; padding: 1rem 2rem; color: white; display: flex; justify-content: space-between; align-items: center;">
+        <div class="nav-logo" style="font-size: 1.5rem; font-weight: bold;">connecT</div>
+        <div class="nav-links" style="display: flex; align-items: center;">
+            <a href="users.html" class="nav-btn" id="usersBtn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Find Users</a>
+            <a href="chat.html" class="nav-btn" id="chatBtn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Messages</a>
+            <a href="project-collaboration.html" class="nav-btn active" id="collabBtn" style="color: white; margin-left: 1rem; text-decoration: underline; font-weight: 500;">Collaboration</a>
+            <a href="events.html" class="nav-btn" id="eventsBtn" style="color: white; margin-left: 1rem; text-decoration: none; font-weight: 500;">Events</a>
+            <span id="navbarUserName" style="color:white; font-weight:bold; margin-left:2rem; font-size:1.2rem; cursor:pointer; display:none;"></span>
+            <button id="logoutBtn" class="logout-btn" style="margin-left:2rem; display:none; background: none; border: none; color: white; font-weight: 500; cursor: pointer;">Logout</button>
+        </div>
+    </nav>
+
+    <div class="collab-container">
+        <div class="team-section">
+            <div class="team-info">
+                <h3>My Team</h3>
+                <p>Form a team of up to 4 members for collaboration</p>
+            </div>
+            <div class="team-members" id="teamMembers">
+                <!-- Team members will be populated here -->
+            </div>
+            <button class="card-btn add-member-btn" onclick="showAddMemberModal()">
+                <i class="fas fa-user-plus"></i> Add Team Member
+            </button>
+        </div>
+
+        <div class="recommendations-section">
+            <h3>Recommended Team Members</h3>
+            <div id="recommendations">
+                <!-- Recommendations will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Team Member</h5>
+                    <button type="button" class="btn-close" onclick="hideAddMemberModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Search Users</label>
+                        <input type="text" class="form-control" id="searchUser" placeholder="Search by name or department">
+                    </div>
+                    <div id="searchResults" class="mt-3">
+                        <!-- Search results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal functions
+        function showAddMemberModal() {
+            document.getElementById('addMemberModal').classList.add('show');
+        }
+
+        function hideAddMemberModal() {
+            document.getElementById('addMemberModal').classList.remove('show');
+            document.getElementById('searchUser').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('addMemberModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideAddMemberModal();
+            }
+        });
+
+        // Check authentication
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                
+                if (!data.isAuthenticated) {
+                    window.location.href = '/login.html';
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error checking auth:', error);
+                return false;
+            }
+        }
+
+        // Load team members
+        async function loadTeamMembers() {
+            try {
+                const response = await fetch('/api/team/members', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load team members');
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Error loading team members');
+                }
+                
+                const teamMembers = document.getElementById('teamMembers');
+                teamMembers.innerHTML = '';
+                
+                // Add leader first
+                if (data.leader) {
+                    const leaderElement = document.createElement('div');
+                    leaderElement.className = 'member-card';
+                    leaderElement.innerHTML = `
+                        <div class="member-avatar">
+                            <i class="fas fa-crown" style="color: gold;"></i>
+                        </div>
+                        <div class="member-info">
+                            <h4>${data.leader.name} (Leader)</h4>
+                            <p>${data.leader.department || 'No department specified'}</p>
+                        </div>
+                    `;
+                    teamMembers.appendChild(leaderElement);
+                }
+
+                // Add members
+                if (data.members && data.members.length > 0) {
+                    data.members.forEach(member => {
+                        const memberElement = document.createElement('div');
+                        memberElement.className = 'member-card';
+                        memberElement.innerHTML = `
+                            <div class="member-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="member-info">
+                                <h4>${member.name}</h4>
+                                <p>${member.department || 'No department specified'}</p>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="removeMember('${member._id}')" style="background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        teamMembers.appendChild(memberElement);
+                    });
+                }
+                
+                if (!data.leader && (!data.members || data.members.length === 0)) {
+                    teamMembers.innerHTML = '<p>No team members yet. Add some members to start collaborating!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading team members:', error);
+                const teamMembers = document.getElementById('teamMembers');
+                teamMembers.innerHTML = '<p class="text-danger">Error loading team members. Please try again later.</p>';
+            }
+        }
+
+        // Load recommendations
+        async function loadRecommendations() {
+            try {
+                const response = await fetch('/api/team/recommendations', {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load recommendations');
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Error loading recommendations');
+                }
+                
+                const recommendations = document.getElementById('recommendations');
+                recommendations.innerHTML = '';
+                
+                if (!data.recommendations || data.recommendations.length === 0) {
+                    recommendations.innerHTML = '<p>No recommendations available at the moment.</p>';
+                    return;
+                }
+
+                data.recommendations.forEach(user => {
+                    const recommendationElement = document.createElement('div');
+                    recommendationElement.className = 'recommendation-card';
+                    recommendationElement.innerHTML = `
+                        <div class="recommendation-info">
+                            <div class="recommendation-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="recommendation-details">
+                                <h4>${user.name}</h4>
+                                <p>${user.department || 'No department specified'}</p>
+                                <small>Common Friends: ${user.commonFriends || 0}</small>
+                            </div>
+                        </div>
+                        <button class="card-btn" onclick="addMember('${user._id}')" style="background: #1abc9c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    `;
+                    recommendations.appendChild(recommendationElement);
+                });
+            } catch (error) {
+                console.error('Error loading recommendations:', error);
+                const recommendations = document.getElementById('recommendations');
+                recommendations.innerHTML = '<p class="text-danger">Error loading recommendations. Please try again later.</p>';
+            }
+        }
+
+        // Search users
+        let searchTimeout;
+        document.getElementById('searchUser').addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchUsers(e.target.value);
+            }, 300);
+        });
+
+        async function searchUsers(query) {
+            if (!query) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/team/search?q=${encodeURIComponent(query)}`, {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to search users');
+                }
+
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Error searching users');
+                }
+                
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '';
+                
+                if (!data.users || data.users.length === 0) {
+                    searchResults.innerHTML = '<p>No users found.</p>';
+                    return;
+                }
+
+                data.users.forEach(user => {
+                    const userElement = document.createElement('div');
+                    userElement.className = 'recommendation-card';
+                    userElement.innerHTML = `
+                        <div class="recommendation-info">
+                            <div class="recommendation-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="recommendation-details">
+                                <h4>${user.name}</h4>
+                                <p>${user.department || 'No department specified'}</p>
+                                <small>${user.university || 'No university specified'}</small>
+                            </div>
+                        </div>
+                        <button class="card-btn" onclick="addMember('${user._id}')" style="background: #1abc9c; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    `;
+                    searchResults.appendChild(userElement);
+                });
+            } catch (error) {
+                console.error('Error searching users:', error);
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '<p class="text-danger">Error searching users. Please try again later.</p>';
+            }
+        }
+
+        // Add team member
+        async function addMember(userId) {
+            try {
+                const response = await fetch('/api/team/members', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ userId })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Team member added successfully');
+                    loadTeamMembers();
+                    loadRecommendations();
+                    hideAddMemberModal();
+                } else {
+                    alert('Error adding team member: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error adding team member:', error);
+                alert('Error adding team member: ' + error.message);
+            }
+        }
+
+        // Remove team member
+        async function removeMember(userId) {
+            if (!confirm('Are you sure you want to remove this team member?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/team/members/${userId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Team member removed successfully');
+                    loadTeamMembers();
+                    loadRecommendations();
+                } else {
+                    alert('Error removing team member: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error removing team member:', error);
+                alert('Error removing team member: ' + error.message);
+            }
+        }
+
+        // Navbar user and logout logic
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                const navbarUserName = document.getElementById('navbarUserName');
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (data.isAuthenticated) {
+                    navbarUserName.textContent = data.user.name;
+                    navbarUserName.style.display = 'inline';
+                    logoutBtn.style.display = 'inline-block';
+                    navbarUserName.onclick = () => { window.location.href = '/profile.html'; };
+                } else {
+                    navbarUserName.style.display = 'none';
+                    logoutBtn.style.display = 'none';
+                }
+                logoutBtn.addEventListener('click', async () => {
+                    try {
+                        const response = await fetch('/api/auth/logout', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+                        if (response.ok) {
+                            window.location.reload();
+                        }
+                    } catch (error) {
+                        console.error('Error logging out:', error);
+                    }
+                });
+            } catch (error) {
+                console.error('Error checking auth status:', error);
+            }
+            if (await checkAuth()) {
+                loadTeamMembers();
+                loadRecommendations();
+            }
+
+            // Set active state for navbar
+            const path = window.location.pathname;
+            const page = path.split("/").pop();
+
+            if (page === 'project-collaboration.html') {
+                document.getElementById('collabBtn').classList.add('active');
+                document.getElementById('collabBtn').style.textDecoration = 'underline';
+            } else if (page === 'users.html') {
+                document.getElementById('usersBtn').classList.add('active');
+                document.getElementById('usersBtn').style.textDecoration = 'underline';
+            } else if (page === 'chat.html') {
+                document.getElementById('chatBtn').classList.add('active');
+                document.getElementById('chatBtn').style.textDecoration = 'underline';
+            } else if (page === 'events.html') {
+                document.getElementById('eventsBtn').classList.add('active');
+                document.getElementById('eventsBtn').style.textDecoration = 'underline';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .projects-container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .project-card {
+            background-color: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .project-card h3 {
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .project-card p {
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .project-card a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .project-card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="projects-container">
+        <div class="projects-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2 style="color: #2c3e50; margin: 0;">Projects</h2>
+            <a href="create-project.html" class="create-btn" style="background: #1abc9c; color: white; padding: 0.75rem 1.5rem; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                <i class="fas fa-plus"></i> Create Project
+            </a>
+        </div>
+
+        <div class="project-card">
+            <h3>Project 1</h3>
+            <p>Description of Project 1. This is a sample project card.</p>
+            <a href="#">View Details</a>
+        </div>
+
+        <div class="project-card">
+            <h3>Project 2</h3>
+            <p>Description of Project 2. Another sample project card.</p>
+            <a href="#">View Details</a>
+        </div>
+    </div>
+</body>
+</html>

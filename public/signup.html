@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>connecT - Sign Up</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+</head>
+<body class="login-body">
+
+  <div class="login-container">
+    <h2>Create your <span style="color: #1abc9c;">connecT</span> Account</h2>
+    <form class="login-form" id="signup-form">
+      <label for="name"></label>
+      <input type="text" id="name" name="name" placeholder="FULL NAME" required />
+
+      <label for="email"></label>
+      <input type="email" id="email" name="email" placeholder="Email : you@university.edu" required />
+
+      <label for="university"></label>
+      <input type="text" id="university" name="university" placeholder="University Name" required />
+
+      <label for="studentId"></label>
+      <input type="text" id="studentId" name="studentId" placeholder="Student ID" required />
+
+      <label for="password"></label>
+      <input type="password" id="password" name="password" placeholder="NEW Password" required />
+      <button type="submit">Sign Up</button>
+      <p class="form-note">Already have an account? <a href="/login">Log in</a></p>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>
